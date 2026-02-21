@@ -1,0 +1,23 @@
+[project]
+name = "rokujo-analyzer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.129.0",
+    "gunicorn>=25.1.0",
+    "honcho>=2.0.0",
+    "ja-ginza>=5.2.0",
+    "spacy>=3.8.11",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.0.2",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
