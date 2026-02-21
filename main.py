@@ -1,3 +1,5 @@
+import threading
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 import spacy
@@ -7,6 +9,7 @@ config = {"nlp": {"tokenizer": {"split_mode": "B"}}}
 
 nlp = spacy.load("ja_ginza", config=config)
 app = FastAPI()
+analyze_lock = threading.Lock()
 
 
 class TextData(BaseModel):
@@ -14,7 +17,7 @@ class TextData(BaseModel):
 
 
 @app.post("/analyze_tokens")
-def analyze(data: TextData):
+async def analyze(data: TextData):
     doc = nlp(data.text)
     tokens = []
     for token in doc:
