@@ -44,3 +44,62 @@ jobs:
       - name: Run pytest
         run: |
           uv run --frozen pytest
+
+      - name: Check Procfile
+        run: |
+          uv run honcho check
+
+      - name: Run the process (Windows)
+        if: runner.os == 'Windows'
+        run: |
+            $process = Start-Process "uv" -ArgumentList "run", "honcho", "start", "-f", "Procfile.windows" `
+                        -NoNewWindow -PassThru
+            Start-Sleep -Seconds 10
+
+            $headers = @{
+              "Accept" = "application/json"
+            }
+            $body = @{ text = "こんにちは" } | ConvertTo-Json
+
+            try {
+                $body = @{ text = "こんにちは" } | ConvertTo-Json
+                $res = Invoke-RestMethod -Uri "http://127.0.0.1:8000/analyze_tokens" `
+                                         -Method Post -Body $body `
+                                         -ContentType "application/json" `
+                                         -Headers $headers
+
+                if ($res.tokens.Count -ge 1) {
+                    Write-Host "Success: $($res.tokens.Count) tokens found."
+                } else {
+                    throw "No tokens found in response."
+                }
+            } finally {
+              Stop-Process -Id $process.Id -Force
+            }
+
+      - name: Run the process (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          uv run honcho start &
+          SERVER_PID=$!
+          sleep 10
+
+          RESPONSE=$(curl -sS -X POST http://127.0.0.1:8000/analyze_tokens \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{"text": "こんにちは"}')
+
+          TOKEN_COUNT=$(echo "$RESPONSE" | jq '.tokens | length')
+
+          echo "Found $TOKEN_COUNT tokens."
+
+          if [ "$TOKEN_COUNT" -gt 0 ]; then
+            echo "Success: Tokens found."
+            kill $SERVER_PID
+            exit 0
+          else
+            echo "Error: No tokens found."
+            kill $SERVER_PID
+            exit 1
+          fi

@@ -1306,6 +1306,7 @@ dependencies = [
     { name = "honcho" },
     { name = "ja-ginza" },
     { name = "spacy" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -1321,6 +1322,7 @@ requires-dist = [
     { name = "honcho", specifier = ">=2.0.0" },
     { name = "ja-ginza", specifier = ">=5.2.0" },
     { name = "spacy", specifier = ">=3.8.11" },
+    { name = "uvicorn", specifier = ">=0.41.0" },
 ]
 
 [package.metadata.requires-dev]
