@@ -52,7 +52,7 @@ jobs:
       - name: Run the process (Windows)
         if: runner.os == 'Windows'
         run: |
-            $process = Start-Process "uv" -ArgumentList "run", "honcho", "start" `
+            $process = Start-Process "uv" -ArgumentList "run", "honcho", "start", "-f", "Procfile.windows" `
                         -NoNewWindow -PassThru
             Start-Sleep -Seconds 10
 
